@@ -11,5 +11,10 @@ xx.json
 yy.json
 *.exe
 *.png
+FFF.bmp
 *.log
 __pycache__
+config.json
+Cargo.lock
+/.idea
+*.ico

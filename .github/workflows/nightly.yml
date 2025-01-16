@@ -1,0 +1,46 @@
+name: Nightly Release
+
+on:
+  push:
+    branches: [ "master" ]
+    paths-ignore:
+    - '**/*.md'
+    - .gitignore
+env:
+  CARGO_TERM_COLOR: always
+
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Rust Toolchain
+        run: |
+          rustup toolchain install nightly
+          rustup default nightly
+      
+      - name: cargo check
+        run: cargo check
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Create zip file
+        run : |
+          cd target/release
+          Compress-Archive -Path ./yap.exe, ./model_training.onnx, ./index_2_word.json -DestinationPath ./yap.zip
+      
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/release/yap.zip
+          tag_name: nightly-${{ github.run_number }}
+          title: Nightly Release ${{ github.run_number }}
+          body: Nightly Release ${{ github.run_number }}
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.YAP_TOKEN }}
